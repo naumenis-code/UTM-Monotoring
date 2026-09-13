@@ -1,0 +1,90 @@
+{{define "content"}}
+{{$root := .}}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <strong>Мониторинг УТМ</strong>
+    {{if .Authenticated}}<a class="btn" href="/utm/new">+ Добавить УТМ</a>{{else}}<a class="btn secondary" href="/login">Войти для управления</a>{{end}}
+  </div>
+
+  {{if not .UTMs}}
+    <div class="empty">Пока не добавлено ни одного УТМ.</div>
+  {{else}}
+  <input type="text" id="utm-search" placeholder="Быстрый поиск по организации или адресу…" autocomplete="off" oninput="filterUTMs()" style="margin-bottom:14px;">
+  <table id="utm-table">
+    <thead>
+      <tr>
+        <th>УТМ</th>
+        <th>Организация</th>
+        <th>Адрес установки</th>
+        <th>Сертификат ЕГАИС</th>
+        <th>ГОСТ-сертификат</th>
+        <th>Опрос</th>
+        {{if .Authenticated}}<th></th>{{end}}
+      </tr>
+    </thead>
+    <tbody>
+      {{range .UTMs}}
+      <tr data-search="{{.OrgName}} {{.InstallAddress}}">
+        <td>
+          <strong>{{if .Label}}{{.Label}}{{else}}УТМ #{{.ID}}{{end}}</strong><br>
+          <span class="muted">{{.IPAddress}}:{{.Port}}</span>
+          {{if .FSRARID}}<br><span class="muted">FSRAR_ID {{.FSRARID}}</span>{{end}}
+        </td>
+        <td>
+          {{if .OrgName}}{{prettyOrgName .OrgName}}<br><span class="muted">ИНН {{.INN}}{{if .KPP}} / КПП {{.KPP}}{{end}}</span>{{else}}<span class="muted">нет данных</span>{{end}}
+        </td>
+        <td>{{if .InstallAddress}}{{.InstallAddress}}{{else}}<span class="muted">нет данных</span>{{end}}</td>
+        <td>{{template "certcell" certInfo .EgaisCertFrom .EgaisCertTo}}</td>
+        <td>{{template "certcell" certInfo .GostCertFrom .GostCertTo}}</td>
+        <td>
+          {{if .LastPolledAt}}
+            {{if .LastPollOK}}
+              <span class="badge ok clickable" data-title="Последний ответ УТМ" data-detail="{{.LastRawResponse}}" onclick="utmShowPollModal(this)">ok</span>
+            {{else}}
+              {{$offlineDays := daysSince .FailingSince}}
+              <span class="badge danger clickable" data-title="Ошибка опроса" data-detail="{{.LastPollError}}" onclick="utmShowPollModal(this)">не в сети{{if gt $offlineDays 0}} · {{$offlineDays}} дн.{{end}}</span>
+            {{end}}<br>
+            <span class="muted">{{fmtDateTime .LastPolledAt}}</span>
+          {{else}}
+            <span class="badge muted">ещё не опрошен</span>
+          {{end}}
+        </td>
+        {{if $root.Authenticated}}
+        <td>
+          <div class="actions">
+            <form class="inline" method="post" action="/utm/{{.ID}}/poll"><button class="btn secondary" type="submit">Опросить</button></form>
+            <a class="btn secondary" href="/utm/{{.ID}}/edit">Изм.</a>
+            <form class="inline" method="post" action="/utm/{{.ID}}/delete" onsubmit="return confirm('Удалить этот УТМ?');"><button class="btn danger" type="submit">Удалить</button></form>
+          </div>
+        </td>
+        {{end}}
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  <div class="empty" id="utm-no-match" hidden>Ничего не найдено.</div>
+  <script>
+    function filterUTMs() {
+      var q = document.getElementById('utm-search').value.trim().toLowerCase();
+      var rows = document.querySelectorAll('#utm-table tbody tr');
+      var visible = 0;
+      rows.forEach(function (row) {
+        var match = !q || row.dataset.search.toLowerCase().indexOf(q) !== -1;
+        row.hidden = !match;
+        if (match) visible++;
+      });
+      document.getElementById('utm-no-match').hidden = visible !== 0;
+    }
+  </script>
+  {{end}}
+</div>
+{{end}}
+
+{{define "certcell"}}
+  {{if .To}}
+    {{fmtDate .From}} — {{fmtDate .To}}<br>
+    <span class="badge {{.BadgeClass}}">{{.DaysLeft}} дн.</span>
+  {{else}}
+    <span class="muted">нет данных</span>
+  {{end}}
+{{end}}

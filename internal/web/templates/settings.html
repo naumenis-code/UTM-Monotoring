@@ -1,0 +1,125 @@
+{{define "content"}}
+<div class="card" style="max-width:560px;">
+  <strong>Расписание опроса</strong>
+  <form method="post" action="/settings">
+    <div class="row">
+      <div>
+        <label for="poll_time_1">Время опроса 1</label>
+        <input type="text" id="poll_time_1" name="poll_time_1" value="{{.Settings.PollTime1}}" placeholder="09:00">
+      </div>
+      <div>
+        <label for="poll_time_2">Время опроса 2 (необязательно)</label>
+        <input type="text" id="poll_time_2" name="poll_time_2" value="{{.Settings.PollTime2}}" placeholder="21:00">
+      </div>
+    </div>
+    <div class="hint">Формат ЧЧ:ММ, время сервера. Оставьте поле 2 пустым, если опрос нужен раз в сутки.</div>
+
+    <label for="telegram_bot_token">Токен Telegram-бота</label>
+    <input type="text" id="telegram_bot_token" name="telegram_bot_token" value="{{.Settings.TelegramBotToken}}" placeholder="123456789:AA...">
+    <div class="hint">Получить токен можно у <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a>.</div>
+
+    <label>Способ отправки в Telegram</label>
+    <div class="row" style="gap:10px;">
+      <label style="display:flex; align-items:center; gap:6px; font-weight:normal; margin:0;">
+        <input type="radio" name="telegram_mode" value="direct" style="width:auto;" onchange="utmToggleMode()" {{if eq .Settings.TelegramMode "direct"}}checked{{end}}> Напрямую
+      </label>
+      <label style="display:flex; align-items:center; gap:6px; font-weight:normal; margin:0;">
+        <input type="radio" name="telegram_mode" value="socks5" style="width:auto;" onchange="utmToggleMode()" {{if eq .Settings.TelegramMode "socks5"}}checked{{end}}> Через SOCKS5
+      </label>
+      <label style="display:flex; align-items:center; gap:6px; font-weight:normal; margin:0;">
+        <input type="radio" name="telegram_mode" value="relay" style="width:auto;" onchange="utmToggleMode()" {{if eq .Settings.TelegramMode "relay"}}checked{{end}}> Через relay-сервер
+      </label>
+    </div>
+    <div class="hint">Если api.telegram.org недоступен напрямую, отправку можно пустить через SOCKS5-прокси или через сторонний relay, зеркалирующий Bot API под своим доменом. Бот проверяет эти настройки при каждой отправке — перезапуск не требуется.</div>
+
+    <div id="utm-mode-socks5" style="display:none;">
+      <label for="telegram_proxy_url">Адрес SOCKS5-прокси</label>
+      <input type="text" id="telegram_proxy_url" name="telegram_proxy_url" value="{{.Settings.TelegramProxyURL}}" placeholder="socks5://user:pass@host:1080">
+    </div>
+
+    <div id="utm-mode-relay" style="display:none;">
+      <label for="telegram_relay_base_url">Адрес relay-сервера</label>
+      <input type="text" id="telegram_relay_base_url" name="telegram_relay_base_url" value="{{.Settings.TelegramRelayBaseURL}}" placeholder="https://ваш-relay">
+      <label for="telegram_relay_auth_key">Ключ авторизации relay-сервера (auth)</label>
+      <input type="text" id="telegram_relay_auth_key" name="telegram_relay_auth_key" value="{{.Settings.TelegramRelayAuthKey}}">
+      <div class="hint">Итоговый запрос: {{"{relay}"}}/bot{{"{token}"}}/sendMessage?auth={{"{ключ}"}}</div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn" type="submit">Сохранить</button>
+    </div>
+  </form>
+</div>
+
+<div class="card" style="max-width:560px;">
+  <strong>Импорт / экспорт УТМ</strong>
+  <div class="hint">Резервная копия списка УТМ на всякий случай — только IP-адрес, порт и название. Организация, адрес и сроки сертификатов не экспортируются: они подтянутся заново при опросе после импорта.</div>
+  <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+    <a class="btn secondary" href="/settings/export">Экспорт CSV</a>
+  </div>
+  <form method="post" action="/settings/import" enctype="multipart/form-data" style="margin-top:14px;">
+    <label for="utm_import_file">Импорт из CSV</label>
+    <input type="file" id="utm_import_file" name="file" accept=".csv,text/csv" required>
+    <div class="hint">Формат: ip_address,port,label (заголовок необязателен, порт по умолчанию 8080). УТМ с уже существующим IP:порт пропускаются, новые сразу опрашиваются.</div>
+    <div style="margin-top:10px;">
+      <button class="btn secondary" type="submit">Импортировать</button>
+    </div>
+  </form>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <strong>Получатели уведомлений в Telegram</strong>
+  <div class="hint">Уведомления придут за 30, 10, 5, 2 и 1 день до окончания каждого сертификата. Получатель, привязанный к конкретному УТМ, видит только его уведомления — так разные клиенты не путаются между собой; получатель без привязки («Все УТМ») получает всё.</div>
+  <table style="margin-top:10px;">
+    <thead><tr><th>Chat ID</th><th>Название</th><th>УТМ</th><th></th></tr></thead>
+    <tbody>
+      {{if not .Chats}}<tr><td colspan="4" class="muted">Получатели не добавлены</td></tr>{{end}}
+      {{range .Chats}}
+      <tr>
+        <td>{{.ChatID}}</td>
+        <td>{{.Label}}</td>
+        <td>{{if .UTMID}}{{.UTMLabel}}{{else}}<span class="muted">Все УТМ</span>{{end}}</td>
+        <td><form class="inline" method="post" action="/settings/telegram/{{.ID}}/delete"><button class="btn danger" type="submit">Удалить</button></form></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+
+  <form method="post" action="/settings/telegram/add" style="margin-top:14px;">
+    <div class="row">
+      <div>
+        <label for="chat_id">Chat ID</label>
+        <input type="text" id="chat_id" name="chat_id" placeholder="123456789 или -1001234567890" required>
+      </div>
+      <div>
+        <label for="chat_label">Название (необязательно)</label>
+        <input type="text" id="chat_label" name="chat_label" placeholder="Иванов И.И.">
+      </div>
+      <div>
+        <label for="utm_id">Уведомлять по УТМ</label>
+        <select id="utm_id" name="utm_id">
+          <option value="">Все УТМ</option>
+          {{range .UTMs}}<option value="{{.ID}}">{{if .Label}}{{.Label}}{{else}}{{if .OrgName}}{{.OrgName}}{{else}}УТМ #{{.ID}}{{end}}{{end}} ({{.IPAddress}})</option>{{end}}
+        </select>
+      </div>
+    </div>
+    <div class="hint">Chat ID можно узнать, написав боту <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>, либо добавив бота в группу.</div>
+    <div style="margin-top:14px;">
+      <button class="btn" type="submit">Добавить получателя</button>
+    </div>
+  </form>
+  <form class="inline" method="post" action="/settings/telegram/test" style="display:block; margin-top:8px;">
+    <button class="btn secondary" type="submit">Отправить тестовое сообщение всем</button>
+  </form>
+</div>
+
+<script>
+function utmToggleMode() {
+  var mode = document.querySelector('input[name="telegram_mode"]:checked');
+  mode = mode ? mode.value : 'direct';
+  document.getElementById('utm-mode-socks5').style.display = (mode === 'socks5') ? 'block' : 'none';
+  document.getElementById('utm-mode-relay').style.display = (mode === 'relay') ? 'block' : 'none';
+}
+utmToggleMode();
+</script>
+{{end}}

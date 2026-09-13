@@ -1,0 +1,122 @@
+{{define "layout"}}
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>УТМ: сроки сертификатов</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%22 stop-color=%22%235ec8f7%22/><stop offset=%221%22 stop-color=%22%231565c0%22/></linearGradient></defs><circle cx=%2232%22 cy=%2232%22 r=%2230%22 fill=%22url(%23g)%22/><path d=%22M44 20a17 17 0 1 0 4 19%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%226%22 stroke-linecap=%22round%22/><path d=%22M44 12v10h-10%22 fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%226%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1c1f24;
+    --muted: #6b7280;
+    --border: #e2e5ea;
+    --accent: #2563eb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --warn: #b45309;
+    --warn-bg: #fffbeb;
+    --ok: #15803d;
+    --ok-bg: #f0fdf4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1c1f24;
+      --text: #e7e9ec;
+      --muted: #9aa1ac;
+      --border: #2c313a;
+      --danger-bg: #2a1414;
+      --warn-bg: #2a2214;
+      --ok-bg: #12241a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, Segoe UI, Roboto, sans-serif; }
+  header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 16px; margin: 0; }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 16px; font-weight: 500; }
+  nav a:hover { color: var(--accent); }
+  main { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  tr:last-child td { border-bottom: none; }
+  .btn { display: inline-block; background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn.danger { background: var(--danger); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  form.inline { display: inline; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  label { display: block; margin: 14px 0 6px; font-weight: 600; }
+  input[type=text], input[type=number], input[type=password], input[type=date], select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 14px; }
+  textarea { font-family: monospace; resize: vertical; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .badge.ok { color: var(--ok); background: var(--ok-bg); }
+  .badge.warn { color: var(--warn); background: var(--warn-bg); }
+  .badge.danger { color: var(--danger); background: var(--danger-bg); }
+  .badge.muted { color: var(--muted); background: var(--bg); }
+  .flash { padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+  .flash.error { background: var(--danger-bg); color: var(--danger); }
+  .flash.ok { background: var(--ok-bg); color: var(--ok); }
+  .muted { color: var(--muted); }
+  .raw { max-width: 320px; max-height: 120px; overflow: auto; white-space: pre-wrap; font-family: monospace; font-size: 11px; background: var(--bg); padding: 6px; border-radius: 6px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 200px; }
+  .badge.clickable { cursor: pointer; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; max-width: 560px; width: 100%; max-height: 80vh; overflow: auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1><svg width="20" height="20" viewBox="0 0 64 64" style="vertical-align:-4px; margin-right:6px;" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ec8f7"/><stop offset="1" stop-color="#1565c0"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#hg)"/><polyline points="14,38 24,28 32,34 44,16 50,22" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="22" r="3.5" fill="#ffffff"/></svg>УТМ: сроки сертификатов</h1>
+  <nav>
+    <a href="/">Список УТМ</a>
+    {{if .Authenticated}}<a href="/settings">Настройки</a>{{end}}
+    {{if .AuthConfigured}}
+      {{if .Authenticated}}
+        <form class="inline" method="post" action="/logout"><button class="btn secondary" type="submit">Выйти</button></form>
+      {{else}}
+        <a href="/login">Войти</a>
+      {{end}}
+    {{end}}
+  </nav>
+</header>
+<main>
+  {{if not .AuthConfigured}}<div class="flash error">⚠️ Пароль администратора не задан (переменная ADMIN_PASSWORD) — управление УТМ и настройки открыты без авторизации.</div>{{end}}
+  {{with .Flash}}<div class="flash {{.Kind}}">{{.Text}}</div>{{end}}
+  {{template "content" .}}
+</main>
+<div class="modal-overlay" id="utm-poll-modal" onclick="if(event.target===this) utmClosePollModal()">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <strong id="utm-poll-modal-title">Подробности</strong>
+      <button class="btn secondary" type="button" onclick="utmClosePollModal()">Закрыть</button>
+    </div>
+    <div class="raw" id="utm-poll-modal-text" style="max-width:none; max-height:60vh;"></div>
+  </div>
+</div>
+<script>
+function utmShowPollModal(el) {
+  document.getElementById('utm-poll-modal-title').textContent = el.dataset.title || 'Подробности';
+  document.getElementById('utm-poll-modal-text').textContent = el.dataset.detail || '(нет данных)';
+  document.getElementById('utm-poll-modal').classList.add('open');
+}
+function utmClosePollModal() {
+  document.getElementById('utm-poll-modal').classList.remove('open');
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') utmClosePollModal();
+});
+</script>
+</body>
+</html>
+{{end}}

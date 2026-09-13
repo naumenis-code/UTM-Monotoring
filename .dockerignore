@@ -1,0 +1,5 @@
+data/
+*.db
+.git/
+.env
+*.pdf

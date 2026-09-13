@@ -1,0 +1,64 @@
+{{define "content"}}
+<div class="card" style="max-width:480px;">
+  <strong>{{if .UTM}}Изменить УТМ{{else}}Добавить УТМ{{end}}</strong>
+  <form method="post" action="{{if .UTM}}/utm/{{.UTM.ID}}/edit{{else}}/utm/new{{end}}">
+    <label for="label">Название (произвольное, необязательно)</label>
+    <input type="text" id="label" name="label" value="{{if .UTM}}{{.UTM.Label}}{{end}}" placeholder="например, Магазин на Ленина">
+
+    <label for="ip">IP-адрес УТМ</label>
+    <input type="text" id="ip" name="ip" value="{{if .UTM}}{{.UTM.IPAddress}}{{end}}" placeholder="192.168.1.10" required {{if .UTM}}readonly{{end}}>
+    <div class="hint">При опросе дашборд пытается сам запросить ИНН, название, адрес и сроки сертификатов у УТМ (как кнопка «Запросить из ЕГАИС» в 1С) — это не всегда быстро и не всегда доходит до ответа. Все эти поля ниже можно заполнить или поправить вручную в любой момент; опрос не затирает их пустотой, только заменяет, если сам что-то определил. Убедитесь также, что IP-адрес этого сервера добавлен в доверенные на самой УТМ (Настройки УТМ → Фильтр IP-адресов) — иначе опрос вообще не будет проходить.</div>
+
+    <label for="port">Порт</label>
+    <input type="number" id="port" name="port" value="{{if .UTM}}{{.UTM.Port}}{{else}}8080{{end}}" min="1" max="65535">
+
+    {{if .UTM}}
+    <label for="fsrar_id">FSRAR_ID</label>
+    <input type="text" id="fsrar_id" value="{{.UTM.FSRARID}}" readonly>
+    <div class="hint">Определяется автоматически через <code>GET /diagnosis</code>, вручную не редактируется.</div>
+
+    <label for="inn">ИНН</label>
+    <input type="text" id="inn" name="inn" value="{{.UTM.INN}}">
+
+    <label for="kpp">КПП</label>
+    <input type="text" id="kpp" name="kpp" value="{{.UTM.KPP}}">
+
+    <label for="org_name">Название организации</label>
+    <input type="text" id="org_name" name="org_name" value="{{.UTM.OrgName}}">
+
+    <label for="install_address">Адрес установки</label>
+    <input type="text" id="install_address" name="install_address" value="{{.UTM.InstallAddress}}">
+
+    <label>Сертификат доступа к ЕГАИС — период действия</label>
+    <div class="row">
+      <div><input type="date" name="egais_cert_from" value="{{fmtDateInput .UTM.EgaisCertFrom}}"></div>
+      <div><input type="date" name="egais_cert_to" value="{{fmtDateInput .UTM.EgaisCertTo}}"></div>
+    </div>
+    <label>ГОСТ-сертификат — период действия</label>
+    <div class="row">
+      <div><input type="date" name="gost_cert_from" value="{{fmtDateInput .UTM.GostCertFrom}}"></div>
+      <div><input type="date" name="gost_cert_to" value="{{fmtDateInput .UTM.GostCertTo}}"></div>
+    </div>
+    <div class="hint">УТМ не публикует эти сроки через API — только на своей домашней странице (раздел «Сертификаты»). Дашборд пытается считать их автоматически, но при необходимости их можно указать вручную здесь; автоматический опрос обновит их, как только сможет определить сам.</div>
+    {{end}}
+
+    <div style="margin-top:20px; display:flex; gap:8px;">
+      <button class="btn" type="submit">{{if .UTM}}Сохранить{{else}}Добавить и опросить{{end}}</button>
+      <a class="btn secondary" href="/">Отмена</a>
+    </div>
+  </form>
+</div>
+
+{{if not .UTM}}
+<div class="card" style="max-width:480px;">
+  <strong>Массовое добавление по списку IP</strong>
+  <div class="hint">Вставьте адреса по одному на строку — просто IP (порт 8080 по умолчанию) или "IP:порт". Уже добавленные пропускаются, каждый новый сразу опрашивается.</div>
+  <form method="post" action="/utm/bulk-add">
+    <textarea name="ips" rows="10" placeholder="192.168.1.10&#10;192.168.1.11&#10;192.168.1.12:9090" style="margin-top:10px;" required></textarea>
+    <div style="margin-top:14px;">
+      <button class="btn secondary" type="submit">Добавить список</button>
+    </div>
+  </form>
+</div>
+{{end}}
+{{end}}

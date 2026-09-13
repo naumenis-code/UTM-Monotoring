@@ -1,0 +1,13 @@
+{{define "content"}}
+<div class="card" style="max-width:360px; margin: 40px auto;">
+  <strong>Вход</strong>
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{.Next}}">
+    <label for="password">Пароль администратора</label>
+    <input type="password" id="password" name="password" autofocus required>
+    <div style="margin-top:20px;">
+      <button class="btn" type="submit">Войти</button>
+    </div>
+  </form>
+</div>
+{{end}}
