@@ -186,7 +186,9 @@ func (s *Scheduler) PollOne(ctx context.Context, u models.UTM) {
 // separate notifications whenever several certificates cross a threshold on
 // the same poll. Each УТМ still only reaches its own scoped recipients plus
 // the unscoped ones, so different clients' contacts never see each other's
-// alerts.
+// alerts. See dueThresholds for what happens when a certificate is found
+// already expired (an outage spanning the expiry date) — it still gets
+// exactly one alert rather than silence.
 func (s *Scheduler) CheckAndNotify(ctx context.Context) {
 	settings, err := s.store.GetSettings()
 	if err != nil {
@@ -259,18 +261,39 @@ type dueThreshold struct {
 	daysLeft  int
 }
 
+// expiredThreshold is a sentinel "threshold" (not a real days-before-expiry
+// value — none of models.NotificationThresholds is 0) used to mark the
+// one-time "already expired and never alerted" notification. It reuses the
+// same notifications_sent row shape without a schema change.
+const expiredThreshold = 0
+
 // dueThresholds returns, farthest-to-closest, every notification threshold
 // that has been reached for this certificate and not already sent for its
 // current expiry date — so if a УТМ was just added or the app was offline
 // for a while, all missed thresholds up to the current one are sent (each
 // still only once).
+//
+// If the certificate is discovered already expired (daysLeft < 0) — e.g.
+// the dashboard was down across the expiry date and missed every countdown
+// threshold — this does not stay silent: it sends one final "истёк" alert
+// instead of replaying stale positive-day thresholds, and only once, so an
+// outage never means the expiry passes without any notification at all.
 func (s *Scheduler) dueThresholds(utmID int64, certType models.CertType, expiry *time.Time, now time.Time) []dueThreshold {
 	if expiry == nil {
 		return nil
 	}
 	daysLeft := int(expiry.Sub(now).Hours() / 24)
+
 	if daysLeft < 0 {
-		return nil
+		sent, err := s.store.NotificationAlreadySent(utmID, certType, *expiry, expiredThreshold)
+		if err != nil {
+			log.Printf("notify: check sent state утм #%d: %v", utmID, err)
+			return nil
+		}
+		if sent {
+			return nil
+		}
+		return []dueThreshold{{threshold: expiredThreshold, daysLeft: daysLeft}}
 	}
 
 	var due []dueThreshold
@@ -304,7 +327,9 @@ func buildDigest(lines []string) string {
 // client: the operator-chosen label first (it's what they intentionally
 // called this site), falling back to the organization name fetched from
 // the УТМ, then the IP. The emoji encodes urgency at a glance when several
-// lines are stacked in one digest.
+// lines are stacked in one digest. A negative daysLeft (the expiredThreshold
+// catch-up case) reads as "истёк ... (N дн. назад)" rather than a confusing
+// negative day count, always at the highest urgency.
 func notificationLine(u models.UTM, certType models.CertType, expiry time.Time, daysLeft, threshold int) string {
 	orgName := models.PrettyOrgName(u.OrgName)
 	name := u.Label
@@ -318,6 +343,10 @@ func notificationLine(u models.UTM, certType models.CertType, expiry time.Time, 
 		name += " (" + orgName + ")"
 	}
 
+	if daysLeft < 0 {
+		return fmt.Sprintf("🚨 %s — %s истёк %s (%d дн. назад)",
+			name, certType.ShortLabel(), expiry.Format("02.01.2006"), -daysLeft)
+	}
 	return fmt.Sprintf("%s %s — %s до %s, %d дн.",
 		urgencyEmoji(threshold), name, certType.ShortLabel(), expiry.Format("02.01.2006"), daysLeft)
 }
