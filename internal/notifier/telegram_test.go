@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/utm-data/internal/models"
 )
 
 func TestBuildRequestDirect(t *testing.T) {

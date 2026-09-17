@@ -27,7 +27,7 @@ import (
 
 	"golang.org/x/net/proxy"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/utm-data/internal/models"
 )
 
 const directAPIBase = "https://api.telegram.org"

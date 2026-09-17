@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/utm-data/internal/models"
 )
 
 type Store struct {

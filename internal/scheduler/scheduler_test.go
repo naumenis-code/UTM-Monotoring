@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/db"
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
-	"github.com/naumenis-code/UTM-Monotoring/internal/store"
-	"github.com/naumenis-code/UTM-Monotoring/internal/utmclient"
+	"github.com/scp-oss/utm-data/internal/db"
+	"github.com/scp-oss/utm-data/internal/models"
+	"github.com/scp-oss/utm-data/internal/store"
+	"github.com/scp-oss/utm-data/internal/utmclient"
 )
 
 // sentMessage is one call the fake Telegram relay received.

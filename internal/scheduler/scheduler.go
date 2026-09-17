@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
-	"github.com/naumenis-code/UTM-Monotoring/internal/notifier"
-	"github.com/naumenis-code/UTM-Monotoring/internal/store"
-	"github.com/naumenis-code/UTM-Monotoring/internal/utmclient"
+	"github.com/scp-oss/utm-data/internal/models"
+	"github.com/scp-oss/utm-data/internal/notifier"
+	"github.com/scp-oss/utm-data/internal/store"
+	"github.com/scp-oss/utm-data/internal/utmclient"
 )
 
 type Scheduler struct {

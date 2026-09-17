@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/naumenis-code/UTM-Monotoring/internal/models"
-	"github.com/naumenis-code/UTM-Monotoring/internal/notifier"
+	"github.com/scp-oss/utm-data/internal/models"
+	"github.com/scp-oss/utm-data/internal/notifier"
 )
 
 type indexData struct {
