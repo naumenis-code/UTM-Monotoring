@@ -230,14 +230,14 @@ DB_PATH=./data/UTM-Monotoring.db HTTP_ADDR=:8088 ADMIN_PASSWORD=... ./UTM-Monoto
 ## Структура проекта
 
 ```
-main.go                — точка входа, сборка компонентов, graceful shutdown
-internal/config         — конфигурация из переменных окружения
-internal/models          — доменные типы
-internal/db               — открытие SQLite и схема (schema.sql)
+main.go                     — точка входа, сборка компонентов, graceful shutdown
+internal/config             — конфигурация из переменных окружения
+internal/models             — доменные типы
+internal/db                 — открытие SQLite и схема (schema.sql)
 internal/store              — доступ к данным (CRUD)
-internal/auth                 — вход по паролю администратора (сессии в памяти)
-internal/utmclient              — опрос HTTP API УТМ (см. предупреждение выше)
-internal/notifier                — отправка сообщений в Telegram (direct/socks5/relay)
-internal/scheduler                — расписание опроса и логика уведомлений
-internal/web                       — HTTP-обработчики и HTML-шаблоны
+internal/auth               — вход по паролю администратора (сессии в памяти)
+internal/utmclient          — опрос HTTP API УТМ (см. предупреждение выше)
+internal/notifier           — отправка сообщений в Telegram (direct/socks5/relay)
+internal/scheduler          — расписание опроса и логика уведомлений
+internal/web                — HTTP-обработчики и HTML-шаблоны
 ```
