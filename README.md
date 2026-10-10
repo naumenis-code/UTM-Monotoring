@@ -240,5 +240,4 @@ internal/utmclient              — опрос HTTP API УТМ (см. преду
 internal/notifier                — отправка сообщений в Telegram (direct/socks5/relay)
 internal/scheduler                — расписание опроса и логика уведомлений
 internal/web                       — HTTP-обработчики и HTML-шаблоны
-documentation.pdf                   — официальная спецификация УТМ от ФСРАР
 ```
