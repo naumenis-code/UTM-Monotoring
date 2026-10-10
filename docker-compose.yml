@@ -1,5 +1,5 @@
 services:
-  utm-dashboard:
+  UTM-Monotoring:
     build: .
     ports:
       - "${DASHBOARD_PORT:-8088}:8088"
@@ -7,6 +7,6 @@ services:
       - ./data:/data
     environment:
       TZ: ${TZ:-Europe/Moscow}
-      DB_PATH: /data/utm-dashboard.db
+      DB_PATH: /data/UTM-Monotoring.db
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
     restart: unless-stopped

@@ -1,4 +1,4 @@
-// Command utm-dashboard runs the web UI, background poller and Telegram
+// Command UTM-Monotoring runs the web UI, background poller and Telegram
 // notifier for monitoring УТМ (ЕГАИС transport module) instances.
 package main
 

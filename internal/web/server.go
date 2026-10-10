@@ -11,10 +11,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/scp-oss/utm-data/internal/auth"
-	"github.com/scp-oss/utm-data/internal/models"
-	"github.com/scp-oss/utm-data/internal/scheduler"
-	"github.com/scp-oss/utm-data/internal/store"
+	"github.com/scp-oss/UTM-Monotoring/internal/auth"
+	"github.com/scp-oss/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/UTM-Monotoring/internal/scheduler"
+	"github.com/scp-oss/UTM-Monotoring/internal/store"
 )
 
 //go:embed templates/*.html

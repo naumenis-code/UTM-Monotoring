@@ -142,8 +142,8 @@ PDF-протокола: старый асинхронный обмен доку�
 ## Быстрый старт (Docker Compose)
 
 ```bash
-git clone <адрес_репозитория> utm-dashboard
-cd utm-dashboard
+git clone <адрес_репозитория> UTM-Monotoring
+cd UTM-Monotoring
 cp .env.example .env
 # отредактируйте .env: задайте ADMIN_PASSWORD и, при необходимости,
 # нестандартный DASHBOARD_PORT
@@ -151,13 +151,13 @@ docker compose up -d --build
 ```
 
 Дашборд будет доступен на `http://<сервер>:${DASHBOARD_PORT}` (по
-умолчанию `8088`). База данных сохраняется в `./data/utm-dashboard.db` на
+умолчанию `8088`). База данных сохраняется в `./data/UTM-Monotoring.db` на
 хосте — том смонтирован, при обновлении контейнера данные не теряются.
 
 ### Как обновить
 
 ```bash
-cd utm-dashboard
+cd UTM-Monotoring
 git pull
 docker compose up -d --build
 ```
@@ -184,8 +184,8 @@ docker compose up -d --build
 Требуется Go 1.26+.
 
 ```bash
-go build -o utm-dashboard .
-DB_PATH=./data/utm-dashboard.db HTTP_ADDR=:8088 ADMIN_PASSWORD=... ./utm-dashboard
+go build -o UTM-Monotoring .
+DB_PATH=./data/UTM-Monotoring.db HTTP_ADDR=:8088 ADMIN_PASSWORD=... ./UTM-Monotoring
 ```
 
 Откройте `http://localhost:8088`.
@@ -198,7 +198,7 @@ DB_PATH=./data/utm-dashboard.db HTTP_ADDR=:8088 ADMIN_PASSWORD=... ./utm-dashboa
 |------------------|------------------------------|----------------------------------------------------------------|
 | `HTTP_ADDR`      | `:8088`                     | Адрес веб-интерфейса дашборда (при запуске без Docker)          |
 | `DASHBOARD_PORT` | `8088`                       | Порт на хосте при запуске через docker-compose (см. `.env`)     |
-| `DB_PATH`        | `./data/utm-dashboard.db`   | Путь к файлу базы данных SQLite                                 |
+| `DB_PATH`        | `./data/UTM-Monotoring.db`   | Путь к файлу базы данных SQLite                                 |
 | `ADMIN_PASSWORD` | *(пусто)*                   | Пароль администратора; без него панель управления открыта всем  |
 
 Всё остальное (токен Telegram-бота, способ доставки/прокси, получатели,

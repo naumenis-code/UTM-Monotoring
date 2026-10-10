@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/scp-oss/utm-data/internal/models"
+	"github.com/scp-oss/UTM-Monotoring/internal/models"
 )
 
 type Store struct {

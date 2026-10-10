@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/scp-oss/utm-data/internal/db"
-	"github.com/scp-oss/utm-data/internal/models"
-	"github.com/scp-oss/utm-data/internal/store"
-	"github.com/scp-oss/utm-data/internal/utmclient"
+	"github.com/scp-oss/UTM-Monotoring/internal/db"
+	"github.com/scp-oss/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/UTM-Monotoring/internal/store"
+	"github.com/scp-oss/UTM-Monotoring/internal/utmclient"
 )
 
 // sentMessage is one call the fake Telegram relay received.

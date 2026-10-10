@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/scp-oss/utm-data/internal/models"
-	"github.com/scp-oss/utm-data/internal/notifier"
+	"github.com/scp-oss/UTM-Monotoring/internal/models"
+	"github.com/scp-oss/UTM-Monotoring/internal/notifier"
 )
 
 type indexData struct {

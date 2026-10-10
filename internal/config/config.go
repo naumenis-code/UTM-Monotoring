@@ -30,7 +30,7 @@ type Config struct {
 func Load() Config {
 	return Config{
 		HTTPAddr:        getEnv("HTTP_ADDR", ":8088"),
-		DBPath:          getEnv("DB_PATH", "./data/utm-dashboard.db"),
+		DBPath:          getEnv("DB_PATH", "./data/UTM-Monotoring.db"),
 		PollHTTPTimeout: 10 * time.Second,
 		AdminPassword:   os.Getenv("ADMIN_PASSWORD"),
 	}
